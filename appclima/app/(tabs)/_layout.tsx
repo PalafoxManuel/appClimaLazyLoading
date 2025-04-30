@@ -1,6 +1,7 @@
+// app/(tabs)/_layout.tsx
+import React, { Suspense } from 'react';
+import { ActivityIndicator, Platform, View } from 'react-native';
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -12,34 +13,46 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+    <Suspense fallback={<LoadingScreen />}>
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+          headerShown: false,
+          tabBarButton: HapticTab,
+          tabBarBackground: TabBarBackground,
+          tabBarStyle: Platform.select({ ios: { position: 'absolute' }, default: {} }),
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="climaActual"
+          options={{
+            title: 'Clima Actual',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="cloud.sun.fill" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="pronostico"
+          options={{
+            title: '15 Días',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="calendar" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="perfil"
+          options={{
+            title: 'Perfil',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.crop.circle.fill" color={color} />,
+          }}
+        />
+      </Tabs>
+    </Suspense>
+  );
+}
+
+function LoadingScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator size="large" color="#007AFF" />
+    </View>
   );
 }
