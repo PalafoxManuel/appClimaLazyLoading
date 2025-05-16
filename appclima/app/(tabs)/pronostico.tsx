@@ -4,7 +4,7 @@ import {
   Alert, Keyboard, ActivityIndicator, Image,
   useColorScheme, ColorSchemeName
 } from 'react-native';
-import { getPronostico } from '../api/weather';
+import { getPronostico } from '../../api/weather';
 
 type Dia = {
   fecha: string;

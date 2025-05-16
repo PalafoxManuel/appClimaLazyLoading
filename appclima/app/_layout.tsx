@@ -1,3 +1,4 @@
+// app/_layout.tsx
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Slot } from 'expo-router';
@@ -5,6 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { AuthProvider } from '@/contexts/AuthContext';   // 👈 nuevo import
 import 'react-native-reanimated';
 
 // Evita que se oculte el splash hasta que todo esté cargado
@@ -27,7 +29,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Slot /> {/* Aquí se renderizan las rutas anidadas como (tabs) */}
+      <AuthProvider>
+        <Slot /> {/* Aquí se renderizan las rutas anidadas (tabs, auth, etc.) */}
+      </AuthProvider>
       <StatusBar style="auto" />
     </ThemeProvider>
   );

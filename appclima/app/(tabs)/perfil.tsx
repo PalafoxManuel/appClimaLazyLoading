@@ -1,3 +1,4 @@
+// app/(tabs)/perfil.tsx
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -8,11 +9,13 @@ import {
   Button,
   Alert,
   useColorScheme,
-  ColorSchemeName
+  ColorSchemeName,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/contexts/AuthContext';           // 👈 Estado y logout
 
 export default function Perfil() {
+  const { user, logout } = useAuth();                       // 👈 user.email y logout
   const [nombre, setNombre] = useState('');
   const [guardado, setGuardado] = useState('');
   const [loading, setLoading] = useState(true);
@@ -20,6 +23,7 @@ export default function Perfil() {
   const theme = useColorScheme();
   const styles = getStyles(theme);
 
+  /* ────────── Cargar nombre local ────────── */
   useEffect(() => {
     const cargarNombre = async () => {
       try {
@@ -37,6 +41,7 @@ export default function Perfil() {
     cargarNombre();
   }, []);
 
+  /* ────────── Guardar nombre en AsyncStorage ────────── */
   const guardarNombre = async () => {
     if (!nombre.trim()) {
       Alert.alert('Campo vacío', 'Escribe un nombre válido');
@@ -51,15 +56,15 @@ export default function Perfil() {
     }
   };
 
-  // Mientras carga, centramos el mensaje
-  if (loading) {
+  /* ────────── Loading splash ────────── */
+  if (loading)
     return (
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingText}>Cargando perfil...</Text>
       </View>
     );
-  }
 
+  /* ────────── UI principal ────────── */
   return (
     <View style={styles.container}>
       <Image
@@ -67,6 +72,7 @@ export default function Perfil() {
         style={styles.avatar}
       />
 
+      {/* Nombre editable */}
       <Text style={styles.label}>Nombre:</Text>
       <TextInput
         value={nombre}
@@ -75,7 +81,6 @@ export default function Perfil() {
         placeholderTextColor={theme === 'dark' ? '#888' : '#666'}
         style={styles.input}
       />
-
       <Button
         title="Guardar cambios"
         onPress={guardarNombre}
@@ -83,75 +88,81 @@ export default function Perfil() {
         color={theme === 'dark' ? '#888' : undefined}
       />
 
+      {/* Resumen de datos */}
       <View style={styles.summary}>
         <Text style={styles.title}>Resumen</Text>
-        <Text style={styles.info}>👤 {guardado || 'No registrado'}</Text>
-        <Text style={styles.info}>📧 usuario@climaapp.com</Text>
+        <Text style={styles.info}>👤 {guardado || 'Sin nombre'}</Text>
+        <Text style={styles.info}>📧 {user?.email ?? 'Sin e-mail'}</Text>
+      </View>
+
+      {/* Cerrar sesión */}
+      <View style={{ marginTop: 40 }}>
+        <Button title="Cerrar sesión" onPress={logout} />
       </View>
     </View>
   );
 }
 
-// Estilos dinámicos para claro/oscuro
-const getStyles = (theme: ColorSchemeName) => StyleSheet.create({
-  // Contenedor principal
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: theme === 'dark' ? '#000' : '#fff',
-    justifyContent: 'center',
-  },
-  // Cargando
-  loadingContainer: {
-    flex: 1,
-    backgroundColor: theme === 'dark' ? '#000' : '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 18,
-    color: theme === 'dark' ? '#fff' : '#000',
-  },
-  // Avatar
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignSelf: 'center',
-    marginBottom: 20,
-    borderWidth: 2,
-    borderColor: theme === 'dark' ? '#444' : '#ccc',
-  },
-  // Etiqueta y input
-  label: {
-    fontSize: 16,
-    marginBottom: 6,
-    color: theme === 'dark' ? '#fff' : '#000',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: theme === 'dark' ? '#666' : '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
-    fontSize: 16,
-    color: theme === 'dark' ? '#fff' : '#000',
-    backgroundColor: theme === 'dark' ? '#111' : '#f9f9f9',
-  },
-  // Resumen
-  summary: {
-    marginTop: 30,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: theme === 'dark' ? '#fff' : '#000',
-  },
-  info: {
-    fontSize: 16,
-    marginBottom: 4,
-    color: theme === 'dark' ? '#ccc' : '#333',
-  },
-});
+/* ────────── Estilos dinámicos ────────── */
+const getStyles = (theme: ColorSchemeName) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 20,
+      backgroundColor: theme === 'dark' ? '#000' : '#fff',
+      justifyContent: 'center',
+    },
+    /* Loading */
+    loadingContainer: {
+      flex: 1,
+      backgroundColor: theme === 'dark' ? '#000' : '#fff',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    loadingText: {
+      fontSize: 18,
+      color: theme === 'dark' ? '#fff' : '#000',
+    },
+    /* Avatar */
+    avatar: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      alignSelf: 'center',
+      marginBottom: 20,
+      borderWidth: 2,
+      borderColor: theme === 'dark' ? '#444' : '#ccc',
+    },
+    /* Input nombre */
+    label: {
+      fontSize: 16,
+      marginBottom: 6,
+      color: theme === 'dark' ? '#fff' : '#000',
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme === 'dark' ? '#666' : '#ccc',
+      borderRadius: 8,
+      padding: 10,
+      marginBottom: 12,
+      fontSize: 16,
+      color: theme === 'dark' ? '#fff' : '#000',
+      backgroundColor: theme === 'dark' ? '#111' : '#f9f9f9',
+    },
+    /* Resumen */
+    summary: {
+      marginTop: 30,
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 8,
+      color: theme === 'dark' ? '#fff' : '#000',
+    },
+    info: {
+      fontSize: 16,
+      marginBottom: 4,
+      color: theme === 'dark' ? '#ccc' : '#333',
+    },
+  });

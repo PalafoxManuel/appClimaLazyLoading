@@ -4,7 +4,7 @@ import {
   Keyboard, ActivityIndicator, useColorScheme, ColorSchemeName
 } from 'react-native'; // ← aquí ya está todo
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getClimaActual } from '../api/weather';
+import { getClimaActual } from '../../api/weather';
 
 export default function ClimaActual() {
   const [ciudad, setCiudad] = useState('');
